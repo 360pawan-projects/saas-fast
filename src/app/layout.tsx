@@ -11,9 +11,8 @@ const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "SassFast",
-  description:
-    "The Next.js boilerplate offers a complete setup for building SaaS, AI tools, and web apps to help you monetize quickly online.",
+  title: "Starter",
+  description: "The Next.js boilerplate offers a complete setup.",
 };
 
 export default function RootLayout({

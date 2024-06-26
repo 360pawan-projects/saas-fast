@@ -1,3 +1,5 @@
+import dbConnect from "@/lib/db/dbConnect";
+import { User as UserModel } from "@/models/user.model";
 import NextAuth, { User, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -12,27 +14,19 @@ const authOptions: NextAuthConfig = {
         password: {},
       },
       async authorize(credentials): Promise<User | null> {
-        const users = [
-          {
-            id: "1",
-            userName: "Pawan",
-            name: "Pawan Kumar",
-            password: "Mywebdev@sassfast",
-            email: "360pawan@gmail.com",
-          },
-        ];
+        // await dbConnect();
 
-        const user = users.find((user) => user.email === credentials.email);
+        // const user = await UserModel.findOne({
+        //   email: credentials.email,
+        //   password: credentials.password,
+        // });
 
-        if (!user) {
-          throw new Error("User not found.");
-        }
+        // if (!user) {
+        //   throw new Error("User not found.");
+        // }
 
-        if (user.password !== credentials.password) {
-          throw new Error("Password is wrong.");
-        }
-
-        return user;
+        // return user;
+        return null;
       },
     }),
   ],
