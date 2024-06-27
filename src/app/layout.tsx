@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 
 import { Toaster } from "@/components/ui/toaster";
+import AuthWrapper from "@/auth/auth-wrapper";
 
 import "./globals.css";
 
@@ -26,7 +27,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={bricolageGrotesque.className}>
-        {children}
+        <AuthWrapper>{children}</AuthWrapper>
         <Toaster />
       </body>
     </html>

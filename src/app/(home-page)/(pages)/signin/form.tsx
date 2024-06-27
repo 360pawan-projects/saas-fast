@@ -6,6 +6,7 @@ import { useState } from "react";
 import { InfoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export const SigninForm = () => {
         });
         form.reset();
         setIsLoggedIn(true);
+        // revalidatePath("/");
       } else {
         toast({
           variant: "destructive",

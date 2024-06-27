@@ -1,21 +1,25 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { NextRequest } from "next/server";
+import { authConfig } from "./auth/auth.config";
+import NextAuth from "next-auth";
+
+const { auth } = NextAuth(authConfig);
+
+import { PUBLIC_ROUTES, LOGIN, ROOT, PROTECTED_SUB_ROUTES } from "@/lib/routes";
+
+export async function middleware(request: NextRequest) {
+  const { nextUrl } = request;
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
+
+  const isPublicRoute =
+    (PUBLIC_ROUTES.find((route) => nextUrl.pathname.startsWith(route)) ||
+      nextUrl.pathname === ROOT) &&
+    !PROTECTED_SUB_ROUTES.find((route) => nextUrl.pathname.includes(route));
+
+  if (!isAuthenticated && !isPublicRoute)
+    return Response.redirect(new URL(LOGIN, nextUrl));
+}
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
-
-export default auth((req) => {
-  const reqUrl = new URL(req.url);
-
-  if (!req.auth && reqUrl?.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(
-      new URL(
-        `${process.env.SITE_URL}/signin?callbackUrl=${encodeURIComponent(
-          reqUrl?.pathname
-        )}`,
-        req.url
-      )
-    );
-  }
-});

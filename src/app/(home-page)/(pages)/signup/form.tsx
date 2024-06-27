@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { z } from "zod";
-import Link from "next/link";
-import { useState } from "react";
-import { InfoIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from 'zod';
+import Link from 'next/link';
+import { useState } from 'react';
+import { InfoIcon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -17,15 +17,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { signIn, signUp } from "@/auth/helpers";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+} from '@/components/ui/form';
+import { signIn } from '@/auth/helpers';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/use-toast';
+import signupUser from '@/auth/service/signupUser';
 
 const formSchema = z.object({
-  name: z.string().trim().min(4, "Name is required"),
+  name: z.string().trim().min(4, 'Name is required'),
   email: z.string().trim().email(),
-  password: z.string().min(4, "Password is minimum 4 characters."),
+  password: z.string().min(4, 'Password is minimum 4 characters.'),
 });
 
 export const SignUpForm = () => {
@@ -36,9 +37,9 @@ export const SignUpForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -46,21 +47,34 @@ export const SignUpForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await signUp(values);
+      const response = await signupUser(values);
 
-      if (response?.success) {
-        router.push("/dashboard");
-        toast({
-          title: "Sent",
-          description: response.message,
+      if (response.status === 'success') {
+        const response = await signIn({
+          email: values.email,
+          password: values.password,
         });
-        form.reset();
-        setIsSignedUp(true);
-      } else {
+
+        if (response?.success) {
+          router.push('/dashboard');
+          toast({
+            title: 'Sent',
+            description: response.message,
+          });
+          form.reset();
+          setIsSignedUp(true);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: response?.message,
+          });
+        }
+      } else if (response.status === 'error') {
         toast({
-          variant: "destructive",
-          title: "Error",
-          description: response?.message,
+          variant: 'destructive',
+          title: 'Error',
+          description: response?.errors[0],
         });
       }
     } catch (error) {

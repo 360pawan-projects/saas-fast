@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/db/dbConnect";
-import { User as UserModel } from "@/models/user.model";
+import { IUser, User as UserModel } from "./model/user.model";
 import NextAuth, { User, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -10,23 +10,29 @@ const authOptions: NextAuthConfig = {
     Credentials({
       name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<User | null> {
-        // await dbConnect();
+        if (credentials === null) return null;
 
-        // const user = await UserModel.findOne({
-        //   email: credentials.email,
-        //   password: credentials.password,
-        // });
+        const email = credentials.email as string;
+        const password = credentials.password as string;
 
-        // if (!user) {
-        //   throw new Error("User not found.");
-        // }
+        await dbConnect();
 
-        // return user;
-        return null;
+        const user: IUser | null = await UserModel.findOne({ email });
+
+        if (!user) {
+          throw new Error("User not found.");
+        }
+
+        const isPasswordValid = await user.isPasswordCorrect(password);
+        if (!isPasswordValid) {
+          throw new Error("Password is wrong.");
+        }
+
+        return user;
       },
     }),
   ],

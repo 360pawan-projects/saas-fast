@@ -1,6 +1,6 @@
-import { auth } from "@/auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { auth } from '@/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +8,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SignOutButton } from "../../../../components/signout-button";
+} from '@/components/ui/dropdown-menu';
+import { SignOutButton } from '@/components/signout-button';
 
 export async function UserNav() {
   const session = await auth();
