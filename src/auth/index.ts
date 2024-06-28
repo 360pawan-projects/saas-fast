@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/db/dbConnect";
-import { IUser, User as UserModel } from "./model/user.model";
+import { IUser, User as UserModel } from "../lib/models/user.model";
 import NextAuth, { User, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 

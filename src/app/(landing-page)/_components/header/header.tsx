@@ -42,7 +42,7 @@ export const Header = async () => {
             {session?.user ? (
               <SignOutButton />
             ) : (
-              <HeaderLink href="/signup" label="Signup" />
+              <HeaderLink href="/signup" label="Sign up" />
             )}
           </div>
         </div>

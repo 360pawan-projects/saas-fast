@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
-import { SigninForm } from "./form";
+import { SignUpForm } from "./form";
 
 export default async function SignInPage() {
   const session = await auth();
@@ -11,8 +11,8 @@ export default async function SignInPage() {
   return (
     <main className="py-10 container mx-auto">
       <div className="mx-auto w-full md:max-w-xl">
-        <h3 className="font-bold text-xl mb-3">Signin Page</h3>
-        <SigninForm />
+        <h3 className="font-bold text-xl mb-3">Sign up</h3>
+        <SignUpForm />
       </div>
     </main>
   );
