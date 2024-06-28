@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SassFast - Login",
+  title: "SassFast - Sign in",
   description:
     "The Next.js boilerplate offers a complete setup for building SaaS, AI tools, and web apps to help you monetize quickly online.",
 };

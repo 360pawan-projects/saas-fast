@@ -4,7 +4,12 @@ import NextAuth from "next-auth";
 
 const { auth } = NextAuth(authConfig);
 
-import { PUBLIC_ROUTES, LOGIN, ROOT, PROTECTED_SUB_ROUTES } from "@/lib/routes";
+import {
+  PUBLIC_ROUTES,
+  SIGNIN,
+  ROOT,
+  PROTECTED_SUB_ROUTES,
+} from "./auth/routes";
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
@@ -17,7 +22,7 @@ export async function middleware(request: NextRequest) {
     !PROTECTED_SUB_ROUTES.find((route) => nextUrl.pathname.includes(route));
 
   if (!isAuthenticated && !isPublicRoute)
-    return Response.redirect(new URL(LOGIN, nextUrl));
+    return Response.redirect(new URL(SIGNIN, nextUrl));
 }
 
 export const config = {
