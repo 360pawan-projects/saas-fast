@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { SignUpForm } from "./form";
 
 export default async function SignInPage() {

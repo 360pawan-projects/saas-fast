@@ -2,11 +2,12 @@
 
 import { z } from "zod";
 import Link from "next/link";
-import { useState } from "react";
 import { InfoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormState, useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,55 +19,57 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { signIn } from "./actions";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { signUp } from "@/lib/auth/actions";
+import { SignInSchema } from "@/schemas/auth";
 
-const formSchema = z.object({
-  name: z.string().trim().min(4, "Name is required"),
-  email: z.string().trim().email(),
-  password: z.string().min(4, "Password is minimum 4 characters."),
-});
+type InitialStateType = {
+  status: "pending" | "error" | "success";
+  message: string;
+};
 
-export const SignUpForm = () => {
+const initialState: InitialStateType = {
+  status: "pending",
+  message: "",
+};
+
+export const SignInForm = () => {
   const router = useRouter();
+  const [state, formAction] = useFormState<InitialStateType, FormData>(
+    signIn,
+    initialState
+  );
+  const { pending } = useFormStatus();
 
-  const [isSignedUp, setIsSignedUp] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const form = useForm<z.infer<typeof SignInSchema>>({
+    resolver: zodResolver(SignInSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
+    reValidateMode: "onChange",
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+  const formRef = useRef<HTMLFormElement>(null);
 
-    const response = await signUp(values);
+  useEffect(() => {
+    if (!state || state.status === "pending") return;
 
-    if (response?.success) {
+    toast({
+      description: state.message,
+      variant: state.status === "success" ? "default" : "destructive",
+    });
+
+    if (state.status === "success") {
       router.push("/dashboard");
-      toast({
-        title: "Sent",
-        description: response.message,
-      });
+      setIsSignedIn(true);
       form.reset();
-      setIsSignedUp(true);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: response?.message,
-      });
     }
+  }, [state, form, router]);
 
-    setIsLoading(false);
-  };
-
-  return isSignedUp ? (
+  return isSignedIn ? (
     <div
       className="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 gap-1 mt-5"
       role="alert"
@@ -74,28 +77,24 @@ export const SignUpForm = () => {
       <InfoIcon className="w-4 h-4" />
       <span className="sr-only">Info</span>
       <span className="font-medium">Success alert!</span> You have been signed
-      up successfully.
+      in successfully.
       <Link href="/dashboard" className="underline">
         Visit dashboard
       </Link>
     </div>
   ) : (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="john" {...field} />
-              </FormControl>
-              <FormDescription>Enter your name.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form
+        className="space-y-4"
+        ref={formRef}
+        action={formAction}
+        onSubmit={(event) => {
+          event.preventDefault();
+          form.handleSubmit(() => {
+            formAction(new FormData(formRef.current!));
+          })(event);
+        }}
+      >
         <FormField
           control={form.control}
           name="email"
@@ -105,7 +104,7 @@ export const SignUpForm = () => {
               <FormControl>
                 <Input type="email" placeholder="john@email.com" {...field} />
               </FormControl>
-              <FormDescription>Enter your email.</FormDescription>
+              <FormDescription>Enter your email to sign in.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -126,8 +125,8 @@ export const SignUpForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading}>
-          Sign up
+        <Button type="submit" disabled={pending}>
+          {pending ? "Signing..." : "Sign in"}
         </Button>
       </form>
     </Form>

@@ -1,10 +1,9 @@
 "use server";
 
-import { User } from "@/lib/models/user.model";
-import { signIn as naSignIn, signOut as naSignOut } from ".";
-import dbConnect from "@/lib/db/dbConnect";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { User } from "../models/user";
+import dbConnect from "@/lib/db-connect";
+import { signIn as naSignIn, signOut as naSignOut } from ".";
 
 export const signUp = async (formData: {
   name: string;
@@ -71,10 +70,6 @@ export const signIn = async (
       password,
       redirect: false,
     });
-
-    console.log(prevState);
-
-    // revalidatePath("/");
 
     return {
       status: "success",

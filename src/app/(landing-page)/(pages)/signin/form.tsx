@@ -2,12 +2,12 @@
 
 import { z } from "zod";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { InfoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,33 +19,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signIn } from "@/auth/actions";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { useFormState, useFormStatus } from "react-dom";
+import { signInAction } from "@/lib/actions/auth";
 
 const formSchema = z.object({
   email: z.string().trim().email(),
   password: z.string().min(4, "Password is minimum 4 characters."),
 });
 
-type InitialStateType = {
-  status: "pending" | "error" | "success";
-  message: string;
-};
-
-const initialState: InitialStateType = {
-  status: "pending",
-  message: "",
-};
-
 export const SignInForm = () => {
   const router = useRouter();
-  const [state, formAction] = useFormState(signIn, initialState);
-  const { pending } = useFormStatus();
 
   const [isSignedIn, setIsSignedIn] = useState(false);
-  // const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,53 +41,41 @@ export const SignInForm = () => {
     reValidateMode: "onChange",
   });
 
-  // const onSubmit = async (values: z.infer<typeof formSchema>) => {
-  //   console.log(state);
+  const { executeAsync, isExecuting } = useAction(signInAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: "Success! 🎉",
+        description: data?.message,
+      });
 
-  //   // setIsLoading(true);
-  //   try {
-  //     const response = await signIn(initialState, values);
-  //     if (response?.success) {
-  //       router.push("/dashboard");
-  //       toast({
-  //         title: "Sent",
-  //         description: response.message,
-  //       });
-  //       form.reset();
-  //       // setIsLoggedIn(true);
-  //       // revalidatePath("/");
-  //     } else {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Error",
-  //         description: response?.message,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     // console.log(error);
-  //   } finally {
-  //     // setIsLoading(false);
-  //   }
-  // };
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (!state || state.status === "pending") return;
-
-    toast({
-      description: state.message,
-      variant: state.status === "success" ? "default" : "destructive",
-    });
-
-    if (state.status === "success") {
-      // router.push("/dashboard");
+      form.reset();
+      router.push("/");
       setIsSignedIn(true);
-      // form.reset();
-    }
-  }, [state]);
+    },
+    onError: ({ error }) => {
+      const {
+        fetchError,
+        bindArgsValidationErrors,
+        serverError,
+        validationErrors,
+      } = error;
 
-  console.log(state);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          fetchError ||
+          bindArgsValidationErrors ||
+          serverError ||
+          validationErrors,
+      });
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await executeAsync(values);
+  };
 
   return isSignedIn ? (
     <div
@@ -118,17 +92,7 @@ export const SignInForm = () => {
     </div>
   ) : (
     <Form {...form}>
-      <form
-        className="space-y-4"
-        ref={formRef}
-        action={formAction}
-        onSubmit={(event) => {
-          event.preventDefault();
-          form.handleSubmit(() => {
-            formAction(new FormData(formRef.current!));
-          })(event);
-        }}
-      >
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -159,8 +123,8 @@ export const SignInForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={pending}>
-          {pending ? "Signing..." : "Sign in"}
+        <Button type="submit" disabled={isExecuting}>
+          {isExecuting ? "Signing..." : "Sign in"}
         </Button>
       </form>
     </Form>
