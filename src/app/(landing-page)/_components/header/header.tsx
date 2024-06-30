@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { RocketIcon } from "@/components/ui/icons";
 import { SignOutButton } from "@/components/signout-button";
 
@@ -8,6 +8,8 @@ import { SignOutButton } from "@/components/signout-button";
 const headerLinks = [
   { href: "/", label: "Public home page" },
   { href: "/dashboard", label: "Dashboard private page" },
+  { href: "/sigin", label: "Sign in" },
+  { href: "/waterfall-signin", label: "Waterfall sign in" },
 ];
 
 const HeaderLink = ({ href, label }: { href: string; label: string }) => (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 
 import { Toaster } from "@/components/ui/toaster";
-import AuthWrapper from "@/auth/auth-wrapper";
+import AuthWrapper from "@/lib/auth/auth-wrapper";
 
 import "./globals.css";
 

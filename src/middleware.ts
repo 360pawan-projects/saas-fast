@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { authConfig } from "./auth/auth.config";
+import { authConfig } from "./lib/auth/auth.config";
 import NextAuth from "next-auth";
 
 const { auth } = NextAuth(authConfig);
@@ -9,7 +9,7 @@ import {
   SIGNIN,
   ROOT,
   PROTECTED_SUB_ROUTES,
-} from "./auth/routes";
+} from "./lib/auth/routes";
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
