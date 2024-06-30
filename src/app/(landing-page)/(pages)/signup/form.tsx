@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { signUp } from "@/lib/auth/actions";
+import { signUp } from "@/lib/actions/auth";
 
 const formSchema = z.object({
   name: z.string().trim().min(4, "Name is required"),
