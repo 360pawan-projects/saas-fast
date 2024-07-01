@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import Link from "next/link";
 import { useState } from "react";
 import { InfoIcon } from "lucide-react";
@@ -21,19 +20,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { signInAction } from "@/lib/actions/auth";
-
-const formSchema = z.object({
-  email: z.string().trim().email(),
-  password: z.string().min(4, "Password is minimum 4 characters."),
-});
+import { signInAction } from "@/server/actions/auth";
+import { SignInSchema, SignInType } from "@/lib/schemas/auth";
 
 export const SignInForm = () => {
   const router = useRouter();
 
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignInType>({
+    resolver: zodResolver(SignInSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -50,7 +45,8 @@ export const SignInForm = () => {
       });
 
       form.reset();
-      router.push("/");
+      router.refresh();
+      router.push("/dashboard");
       setIsSignedIn(true);
     },
     onError: ({ error }) => {
@@ -73,7 +69,7 @@ export const SignInForm = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: SignInType) => {
     await executeAsync(values);
   };
 

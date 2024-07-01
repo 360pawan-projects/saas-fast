@@ -1,8 +1,5 @@
-import { NextRequest } from "next/server";
-import { authConfig } from "./lib/auth/auth.config";
 import NextAuth from "next-auth";
-
-const { auth } = NextAuth(authConfig);
+import { NextRequest } from "next/server";
 
 import {
   PUBLIC_ROUTES,
@@ -10,6 +7,13 @@ import {
   ROOT,
   PROTECTED_SUB_ROUTES,
 } from "./lib/auth/routes";
+
+const { auth } = NextAuth({
+  session: {
+    strategy: "jwt",
+  },
+  providers: [],
+});
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;

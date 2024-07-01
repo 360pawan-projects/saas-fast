@@ -6,6 +6,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  token: string;
   // refreshToken?: string;
   // emailToken?: string;
   // isVerifiedEmail: boolean;
@@ -27,6 +28,7 @@ const userSchema = new Schema(
       trim: true,
     },
     password: { type: String, required: true },
+    token: { type: String },
     // isVerifiedEmail: {
     //   type: Boolean,
     //   default: false,

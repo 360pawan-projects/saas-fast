@@ -1,7 +1,8 @@
-import dbConnect from "@/lib/db-connect";
-import { IUser, User as UserModel } from "../models/user";
 import NextAuth, { User, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+
+import dbConnect from "@/lib/db-connect";
+import { IUser, User as UserModel } from "@/server/models/user";
 
 export const BASE_PATH = "/api/auth";
 
@@ -36,8 +37,24 @@ const authOptions: NextAuthConfig = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }: { token: any; user: any }) {
+      console.log({ ...token, ...user });
+
+      return { ...token, ...user };
+    },
+
+    async session({ session, token }: { session: any; token: any }) {
+      session.user = token;
+
+      return session;
+    },
+  },
   basePath: BASE_PATH,
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/login",
+  },
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
