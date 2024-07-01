@@ -1,15 +1,13 @@
 import Link from "next/link";
 
-import { auth } from "@/lib/auth";
 import { RocketIcon } from "@/components/ui/icons";
-import { SignOutButton } from "@/components/signout-button";
 
 //* Add your links here
 const headerLinks = [
   { href: "/", label: "Public home page" },
   { href: "/dashboard", label: "Dashboard private page" },
-  { href: "/sigin", label: "Sign in" },
-  { href: "/waterfall-signin", label: "Waterfall sign in" },
+  { href: "/signin", label: "Sign in" },
+  { href: "/signup", label: "Sign up" },
 ];
 
 const HeaderLink = ({ href, label }: { href: string; label: string }) => (
@@ -22,8 +20,6 @@ const HeaderLink = ({ href, label }: { href: string; label: string }) => (
 );
 
 export const Header = async () => {
-  const session = await auth();
-
   return (
     <header className="container mx-auto">
       <nav className="flex items-center py-8 gap-5 sm:gap-20 justify-between">
@@ -41,11 +37,6 @@ export const Header = async () => {
             {headerLinks.map((link, index) => (
               <HeaderLink key={index} href={link.href} label={link.label} />
             ))}
-            {session?.user ? (
-              <SignOutButton />
-            ) : (
-              <HeaderLink href="/signup" label="Sign up" />
-            )}
           </div>
         </div>
       </nav>

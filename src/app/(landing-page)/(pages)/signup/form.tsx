@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { signUp } from "@/lib/auth/actions";
+import { signUpAction } from "@/server/actions/auth";
 
 const formSchema = z.object({
   name: z.string().trim().min(4, "Name is required"),
@@ -45,25 +45,25 @@ export const SignUpForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
 
-    const response = await signUp(values);
+    const response = await signUpAction(values);
 
-    if (response?.success) {
-      router.push("/dashboard");
-      toast({
-        title: "Sent",
-        description: response.message,
-      });
-      form.reset();
-      setIsSignedUp(true);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: response?.message,
-      });
-    }
+    // if (response?.success) {
+    //   router.push("/dashboard");
+    //   toast({
+    //     title: "Sent",
+    //     description: response.message,
+    //   });
+    //   form.reset();
+    //   setIsSignedUp(true);
+    // } else {
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Error",
+    //     description: response?.message,
+    //   });
+    // }
 
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   return isSignedUp ? (
